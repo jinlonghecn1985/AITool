@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hnjing.ai.model.dao.RegulationsMapper">
+
+<!-- Result Map-->
+<resultMap id="RegulationsResultMap" type="com.hnjing.ai.model.entity.Regulations">
+	<id column="regulations_id" property="regulationsId"/>
+	<result column="project_id" property="projectId"/>
+	<result column="regulations" property="regulations"/>
+	<result column="content" property="content"/>
+	<result column="uscode" property="uscode"/>
+	<result column="usorder" property="usorder"/>
+	<result column="as_num" property="asNum"/>
+	<result column="as_yes" property="asYes"/>
+	<result column="as_yes_num" property="asYesNum"/>
+	<result column="as_no" property="asNo"/>
+	<result column="as_no_num" property="asNoNum"/>
+	<result column="as_other" property="asOther"/>
+	<result column="as_other_num" property="asOtherNum"/>
+	<result column="gmt_created" property="gmtCreated"/>
+	<result column="gmt_modify" property="gmtModify"/>
+</resultMap>
+
+<sql id="sql_regulations_item">
+	regulations_id, project_id, regulations, content, uscode, usorder, as_num, as_yes, as_yes_num, as_no, as_no_num, as_other, as_other_num, gmt_created, gmt_modify
+</sql>
+       
+<!-- 查询条件 无WHERE -->
+<sql id="sql_regulations_query_nowhere">
+	<trim prefix=" " prefixOverrides="AND|OR">
+		<if test="regulations.regulationsId != null">AND regulations_id = #{regulations.regulationsId} </if>
+		<if test="regulations.projectId != null">AND project_id = #{regulations.projectId} </if>
+		<if test="regulations.regulations != null">AND regulations like concat(#{regulations.regulations}, '%') </if>
+		<if test="regulations.content != null">AND ( content like concat('%', #{regulations.content}, '%') or as_other like concat('%', #{regulations.content}, '%')
+					or as_yes like concat('%', #{regulations.content}, '%') or as_no like concat('%', #{regulations.content}, '%') )</if>
+		<if test="regulations.uscode != null">AND uscode = #{regulations.uscode} </if>
+		<if test="regulations.usorder != null">AND usorder = #{regulations.usorder} </if>
+		<if test="regulations.asNum != null">AND as_num = #{regulations.asNum} </if>
+		<if test="regulations.asYes != null">AND as_yes like concat(#{regulations.asYes}, '%') </if>
+		<if test="regulations.asYesNum != null">AND as_yes_num = #{regulations.asYesNum} </if>
+		<if test="regulations.asNo != null">AND as_no like concat(#{regulations.asNo}, '%') </if>
+		<if test="regulations.asNoNum != null">AND as_no_num = #{regulations.asNoNum} </if>
+		<if test="regulations.asOther != null">AND as_other like concat(#{regulations.asOther}, '%') </if>
+		<if test="regulations.asOtherNum != null">AND as_other_num = #{regulations.asOtherNum} </if>
+	</trim>
+</sql>
+   
+<!-- 插入 项目流程话术 -->
+<insert id="addRegulations" parameterType="com.hnjing.ai.model.entity.Regulations" >
+	<selectKey keyProperty="regulationsId" order="AFTER" resultType="java.lang.Integer">
+		SELECT LAST_INSERT_ID()
+	</selectKey>
+ 	INSERT INTO tb_regulations 
+	<trim prefix=" (" suffix=")" suffixOverrides=",">
+		<if test="regulationsId != null"> regulations_id,</if>
+		<if test="projectId != null"> project_id,</if>
+		<if test="regulations != null"> regulations,</if>
+		<if test="content != null"> content,</if>
+		<if test="uscode != null"> uscode,</if>
+		<if test="usorder != null"> usorder,</if>
+		<if test="asNum != null"> as_num,</if>
+		<if test="asYes != null"> as_yes,</if>
+		<if test="asYesNum != null"> as_yes_num,</if>
+		<if test="asNo != null"> as_no,</if>
+		<if test="asNoNum != null"> as_no_num,</if>
+		<if test="asOther != null"> as_other,</if>
+		<if test="asOtherNum != null"> as_other_num,</if>
+		gmt_created, gmt_modify
+	</trim>	 	
+	<trim prefix="values (" suffix=")" suffixOverrides=",">
+		<if test="regulationsId != null"> #{regulationsId},</if>
+		<if test="projectId != null"> #{projectId},</if>
+		<if test="regulations != null"> #{regulations},</if>
+		<if test="content != null"> #{content},</if>
+		<if test="uscode != null"> #{uscode},</if>
+		<if test="usorder != null"> #{usorder},</if>
+		<if test="asNum != null"> #{asNum},</if>
+		<if test="asYes != null"> #{asYes},</if>
+		<if test="asYesNum != null"> #{asYesNum},</if>
+		<if test="asNo != null"> #{asNo},</if>
+		<if test="asNoNum != null"> #{asNoNum},</if>
+		<if test="asOther != null"> #{asOther},</if>
+		<if test="asOtherNum != null"> #{asOtherNum},</if>
+		now(), now()
+	</trim>
+</insert>
+
+<!-- 根据标识，修改 项目流程话术 -->  
+<update id="modifyRegulations" parameterType="com.hnjing.ai.model.entity.Regulations" >
+  	UPDATE tb_regulations SET
+	<trim suffixOverrides=",">
+		<if test="projectId != null"> project_id = #{projectId},</if>
+		<if test="regulations != null"> regulations = #{regulations},</if>
+		<if test="content != null"> content = #{content},</if>
+		<if test="uscode != null"> uscode=#{uscode},</if>
+		<if test="usorder != null"> uscode=#{usorder},</if>
+		<if test="asNum != null"> as_num = #{asNum},</if>
+		<if test="asYes != null"> as_yes = #{asYes},</if>
+		<if test="asYesNum != null"> as_yes_num = #{asYesNum},</if>
+		<if test="asNo != null"> as_no = #{asNo},</if>
+		<if test="asNoNum != null"> as_no_num = #{asNoNum},</if>
+		<if test="asOther != null"> as_other = #{asOther},</if>
+		<if test="asOtherNum != null"> as_other_num = #{asOtherNum},</if>
+		gmt_modify = now()
+	</trim>
+	WHERE regulations_id = #{regulationsId}
+</update>
+ 
+<!-- 删除 项目流程话术 -->
+<delete id="dropRegulationsByProjectId" parameterType="java.lang.Integer">
+	DELETE FROM tb_regulations WHERE project_id = #{projectId}
+</delete> 
+
+<delete id="dropRegulationsByRegulationsId" parameterType="java.lang.Integer">
+	DELETE FROM tb_regulations WHERE regulations_id = #{regulationsId}
+</delete> 
+<!-- 根据标识查询 项目流程话术 -->
+<select id="queryRegulationsByRegulationsId"  resultMap="RegulationsResultMap" parameterType="java.lang.Integer">
+	SELECT 
+	<include refid="sql_regulations_item"/>
+	FROM tb_regulations WHERE regulations_id = #{regulationsId}
+</select>
+
+<!-- 根据属性查询项目流程话术 -->
+<select id="queryRegulationsByProperty"  resultMap="RegulationsResultMap" parameterType="java.util.Map">
+	SELECT 
+	<include refid="sql_regulations_item"/>
+	FROM tb_regulations 
+	<where>
+		<include refid="sql_regulations_query_nowhere"/>
+	</where>
+</select>
+
+<!-- 根据项目流程话术属性与分页信息分页查询项目流程话术信息 -->
+<select id="queryRegulationsForPage"  resultMap="RegulationsResultMap" > 
+	SELECT 
+	<include refid="sql_regulations_item"/>
+	FROM tb_regulations 
+	<where>
+		<include refid="sql_regulations_query_nowhere"/>
+	</where>
+</select>
+
+</mapper>   

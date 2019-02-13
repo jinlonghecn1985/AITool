@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hnjing.ai.model.dao.CommunicateMapper">
+
+<!-- Result Map-->
+<resultMap id="CommunicateResultMap" type="com.hnjing.ai.model.entity.Communicate">
+	<id column="cid" property="cid"/>
+	<result column="project_id" property="projectId"/>
+	<result column="use_code" property="useCode"/>
+	<result column="call_from" property="callFrom"/>
+	<result column="phone" property="phone"/>
+	<result column="name" property="name"/>
+	<result column="company" property="company"/>
+	<result column="call_date" property="callDate"/>
+	<result column="call_length" property="callLength"/>
+	<result column="call_times" property="callTimes"/>
+	<result column="user_type" property="userType"/>
+	<result column="note" property="note"/>
+	<result column="content" property="content"  typeHandler="com.hnjing.utils.MyBlobTypeHandler"/>
+	<result column="gmt_created" property="gmtCreated"/>
+	<result column="gmt_modify" property="gmtModify"/>
+</resultMap>
+
+<sql id="sql_communicate_item">
+	cid, project_id, use_code, call_from, phone, name, company, call_date, call_length, call_times, user_type, note, content, gmt_created, gmt_modify
+</sql>
+       
+<!-- 查询条件 无WHERE -->
+<sql id="sql_communicate_query_nowhere">
+	<trim prefix=" " prefixOverrides="AND|OR">
+		<if test="communicate.cid != null">AND cid = #{communicate.cid} </if>
+		<if test="communicate.projectId != null">AND project_id = #{communicate.projectId} </if>
+		<if test="communicate.useCode != null">AND use_code like concat(#{communicate.useCode}, '%') </if>
+		<if test="communicate.callFrom != null">AND call_from like concat(#{communicate.callFrom}, '%') </if>
+		<if test="communicate.phone != null">AND phone like concat(#{communicate.phone}, '%') </if>
+		<if test="communicate.name != null">AND name like concat(#{communicate.name}, '%') </if>
+		<if test="communicate.company != null">AND company like concat(#{communicate.company}, '%') </if>
+		<if test="communicate.callLength != null">AND call_length = #{communicate.callLength} </if>
+		<if test="communicate.userType != null">AND user_type like concat(#{communicate.userType}, '%') </if>
+		<if test="communicate.note != null">AND ( phone like concat('%', #{communicate.note}, '%') or name like concat('%', #{communicate.note}, '%')
+					or company like concat('%', #{communicate.note}, '%') or content like concat('%', #{communicate.note}, '%')
+					or use_code like concat('%', #{communicate.note}, '%') )</if>
+		<if test="communicate.gmtCreated != null">AND gmt_created like concat(#{communicate.gmtCreated}, '%') </if>
+		<if test="communicate.gmtModify != null">AND gmt_modify like concat(#{communicate.gmtModify}, '%') </if>
+	</trim>
+</sql>
+   
+<!-- 插入 沟通详情 -->
+<insert id="addCommunicate" parameterType="com.hnjing.ai.model.entity.Communicate" >
+	<selectKey keyProperty="cid" order="AFTER" resultType="java.lang.Integer">
+		SELECT LAST_INSERT_ID()
+	</selectKey>
+ 	INSERT INTO tb_communicate 
+	<trim prefix=" (" suffix=")" suffixOverrides=",">
+		<if test="cid != null"> cid,</if>
+		<if test="projectId != null"> project_id,</if>
+		<if test="useCode != null"> use_code,</if>
+		<if test="callFrom != null"> call_from,</if>
+		<if test="phone != null"> phone,</if>
+		<if test="name != null"> name,</if>
+		<if test="company != null"> company,</if>
+		<if test="callDate != null"> call_date,</if>
+		<if test="callLength != null"> call_length,</if>
+		<if test="callTimes != null"> call_times,</if>
+		<if test="userType != null"> user_type,</if>
+		<if test="note != null"> note,</if>
+		<if test="content != null"> content,</if>
+		gmt_created, gmt_modify
+	</trim>	 	
+	<trim prefix="values (" suffix=")" suffixOverrides=",">
+		<if test="cid != null"> #{cid},</if>
+		<if test="projectId != null"> #{projectId},</if>
+		<if test="useCode != null"> #{useCode},</if>
+		<if test="callFrom != null"> #{callFrom},</if>
+		<if test="phone != null"> #{phone},</if>
+		<if test="name != null"> #{name},</if>
+		<if test="company != null"> #{company},</if>
+		<if test="callDate != null"> #{callDate},</if>
+		<if test="callLength != null"> #{callLength},</if>
+		<if test="callTimes != null"> #{callTimes},</if>
+		<if test="userType != null"> #{userType},</if>
+		<if test="note != null"> #{note},</if>
+		<if test="content != null"> #{content},</if>
+		now(), now()
+	</trim>
+</insert>
+
+<!-- 根据标识，修改 沟通详情 -->  
+<update id="modifyCommunicate" parameterType="com.hnjing.ai.model.entity.Communicate" >
+  	UPDATE tb_communicate SET
+	<trim suffixOverrides=",">
+		<if test="projectId != null"> project_id = #{projectId},</if>
+		<if test="useCode != null"> use_code = #{useCode},</if>
+		<if test="useCode == null"> use_code = null,</if>
+		<if test="callFrom != null"> call_from = #{callFrom},</if>
+		<if test="phone != null"> phone = #{phone},</if>
+		<if test="name != null"> name = #{name},</if>
+		<if test="company != null"> company = #{company},</if>
+		<if test="callDate != null"> call_date = #{callDate},</if>
+		<if test="callLength != null"> call_length = #{callLength},</if>
+		<if test="callTimes != null"> call_times = #{callTimes},</if>
+		<if test="userType != null"> user_type = #{userType},</if>
+		<if test="note != null"> note = #{note},</if>
+		<if test="content != null"> content = #{content},</if>
+		gmt_modify = #{gmtModify}
+	</trim>
+	WHERE cid = #{cid}
+</update>
+ 
+<!-- 删除 沟通详情 -->
+<delete id="dropCommunicateByCid" parameterType="java.lang.Integer">
+	DELETE FROM tb_communicate WHERE cid = #{cid}
+</delete> 
+
+<delete id="dropCommunicateByProjectId" parameterType="java.lang.Integer">
+	DELETE FROM tb_communicate WHERE project_id = #{projectId}
+</delete> 
+
+<!-- 根据标识查询 沟通详情 -->
+<select id="queryCommunicateByCid"  resultMap="CommunicateResultMap" parameterType="java.lang.Integer">
+	SELECT 
+	<include refid="sql_communicate_item"/>
+	FROM tb_communicate WHERE cid = #{cid}
+</select>
+
+<!-- 根据属性查询沟通详情 -->
+<select id="queryCommunicateByProperty"  resultMap="CommunicateResultMap" parameterType="java.util.Map">
+	SELECT 
+	<include refid="sql_communicate_item"/>
+	FROM tb_communicate 
+	<where>
+		<include refid="sql_communicate_query_nowhere"/>
+	</where>
+</select>
+
+<!-- 根据沟通详情属性与分页信息分页查询沟通详情信息 -->
+<select id="queryCommunicateForPage"  resultMap="CommunicateResultMap" > 
+	SELECT 
+	<include refid="sql_communicate_item"/>
+	FROM tb_communicate 
+	<where>
+		<include refid="sql_communicate_query_nowhere"/>
+	</where>
+</select>
+
+</mapper>   

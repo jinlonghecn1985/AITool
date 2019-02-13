@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hnjing.ai.model.dao.AssessmentMapper">
+
+<!-- Result Map-->
+<resultMap id="AssessmentResultMap" type="com.hnjing.ai.model.entity.Assessment">
+	<result column="cid" property="cid"/>
+	<result column="rid" property="rid"/>
+	<result column="phone" property="phone"/>
+	<result column="project_id" property="projectId"/>
+	<result column="flag" property="flag"/>
+	<result column="question" property="question"/>
+	<result column="answer" property="answer"/>
+	<result column="keyword" property="keyword"/>
+	<result column="assessment" property="assessment"/>
+</resultMap>
+
+<sql id="sql_assessment_item">
+	cid, flag, rid, phone, question, answer, keyword, assessment
+</sql>
+       
+<!-- 查询条件 无WHERE -->
+<sql id="sql_assessment_query_nowhere">
+	<trim prefix=" " prefixOverrides="AND|OR">
+		<if test="assessment.cid != null">AND cid = #{assessment.cid} </if>
+		<if test="assessment.rid != null">AND rid = #{assessment.rid} </if>
+		<if test="assessment.projectId != null">AND project_id = #{assessment.projectId} </if>
+		<if test="assessment.flag != null">AND flag = #{assessment.flag} </if>
+		<if test="assessment.phone != null">AND phone like concat('%', #{assessment.question}, '%') </if>
+		<if test="assessment.question != null">AND question like concat(#{assessment.question}, '%') </if>
+		<if test="assessment.answer != null">AND answer like concat(#{assessment.answer}, '%') </if>
+		<if test="assessment.keyword != null">AND ( answer like concat('%', #{assessment.keyword}, '%') or question like concat('%', #{assessment.keyword}, '%')
+					or keyword like concat('%', #{assessment.keyword}, '%') )</if>
+		<if test="assessment.assessment != null">AND assessment = #{assessment.assessment} </if>
+	</trim>
+</sql>
+   
+<!-- 插入 沟通分析 -->
+<insert id="addAssessment" parameterType="com.hnjing.ai.model.entity.Assessment" >	
+ 	INSERT INTO tb_assessment 
+	<trim prefix=" (" suffix=")" suffixOverrides=",">
+		<if test="cid != null"> cid,</if>
+		<if test="rid != null"> rid,</if>
+		<if test="phone != null"> phone,</if>
+		<if test="projectId != null"> project_id,</if>
+		<if test="flag != null"> flag,</if>
+		<if test="question != null"> question,</if>
+		<if test="answer != null"> answer,</if>
+		<if test="keyword != null"> keyword,</if>
+		<if test="assessment != null"> assessment,</if>
+	</trim>	 	
+	<trim prefix="values (" suffix=")" suffixOverrides=",">
+		<if test="cid != null"> #{cid},</if>
+		<if test="rid != null"> #{rid},</if>
+		<if test="phone != null"> #{phone},</if>
+		<if test="projectId != null"> #{projectId},</if>
+		<if test="flag != null"> #{flag},</if>
+		<if test="question != null"> #{question},</if>
+		<if test="answer != null"> #{answer},</if>
+		<if test="keyword != null"> #{keyword},</if>
+		<if test="assessment != null"> #{assessment},</if>
+	</trim>
+</insert>
+
+<!-- 根据标识，修改 沟通分析 -->  
+<update id="modifyAssessment" parameterType="com.hnjing.ai.model.entity.Assessment" >
+  	UPDATE tb_assessment SET
+	<trim suffixOverrides=",">
+		<if test="flag != null"> flag = #{flag},</if>
+		<if test="rid != null"> rid = #{rid},</if>
+		<if test="phone != null"> phone = #{phone},</if>
+		<if test="projectId != null"> project_id = #{projectId},</if>
+		<if test="question != null"> question = #{question},</if>
+		<if test="answer != null"> answer = #{answer},</if>
+		<if test="keyword != null"> keyword = #{keyword},</if>
+		<if test="assessment != null"> assessment = #{assessment},</if>
+	</trim>
+	WHERE cid = #{cid}
+</update>
+ 
+<!-- 删除 沟通分析 -->
+<delete id="dropAssessmentByCid" parameterType="java.lang.Integer">
+	DELETE FROM tb_assessment WHERE cid = #{cid}
+</delete> 
+
+<delete id="dropAssessmentByProjectId" parameterType="java.lang.Integer">
+	DELETE FROM tb_assessment WHERE project_id = #{projectId}
+</delete> 
+
+<!-- 根据标识查询 沟通分析 -->
+<select id="queryAssessmentByCid"  resultMap="AssessmentResultMap" parameterType="java.lang.Integer">
+	SELECT 
+	<include refid="sql_assessment_item"/>
+	FROM tb_assessment WHERE cid = #{cid}
+</select>
+
+<!-- 根据属性查询沟通分析 -->
+<select id="queryAssessmentByProperty"  resultMap="AssessmentResultMap" parameterType="java.util.Map">
+	SELECT 
+	<include refid="sql_assessment_item"/>
+	FROM tb_assessment 
+	<where>
+		<include refid="sql_assessment_query_nowhere"/>
+		<if test="assessment.norid != null">AND rid is null </if>
+	</where>
+</select>
+
+<!-- 根据沟通分析属性与分页信息分页查询沟通分析信息 -->
+<select id="queryAssessmentForPage"  resultMap="AssessmentResultMap" > 
+	SELECT 
+	<include refid="sql_assessment_item"/>
+	FROM tb_assessment 
+	<where>
+		<include refid="sql_assessment_query_nowhere"/>
+	</where>
+</select>
+
+</mapper>   

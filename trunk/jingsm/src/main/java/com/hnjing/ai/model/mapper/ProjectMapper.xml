@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hnjing.ai.model.dao.ProjectMapper">
+
+<!-- Result Map-->
+<resultMap id="ProjectResultMap" type="com.hnjing.ai.model.entity.Project">
+	<id column="project_id" property="projectId"/>
+	<result column="project_name" property="projectName"/>
+	<result column="total_num" property="totalNum"/>
+	<result column="connected_num" property="connectedNum"/>
+	<result column="sure_num" property="sureNum"/>
+	<result column="negative_num" property="negativeNum"/>
+	<result column="neutral_num" property="neutralNum"/>
+	<result column="s_code" property="sCode"/>
+	<result column="note" property="note"/>
+	<result column="gmt_created" property="gmtCreated"/>
+	<result column="gmt_modify" property="gmtModify"/>
+</resultMap>
+
+<sql id="sql_project_item">
+	project_id, project_name, total_num, connected_num, sure_num, negative_num, neutral_num, s_code, note, gmt_created, gmt_modify
+</sql>
+       
+<!-- 查询条件 无WHERE -->
+<sql id="sql_project_query_nowhere">
+	<trim prefix=" " prefixOverrides="AND|OR">
+		<if test="project.projectId != null">AND project_id = #{project.projectId} </if>
+		<if test="project.projectName != null">AND project_name like concat('%', #{project.projectName}, '%') </if>
+		<if test="project.totalNum != null">AND total_num = #{project.totalNum} </if>
+		<if test="project.connectedNum != null">AND connected_num = #{project.connectedNum} </if>
+		<if test="project.sureNum != null">AND sure_num = #{project.sureNum} </if>
+		<if test="project.negativeNum != null">AND negative_num = #{project.negativeNum} </if>
+		<if test="project.neutralNum != null">AND neutral_num = #{project.neutralNum} </if>
+		<if test="project.sCode != null">AND s_code like concat(#{project.sCode}, '%') </if>
+		<if test="project.note != null">AND note like concat(#{project.note}, '%') </if>
+	</trim>
+</sql>
+   
+<!-- 插入 AI项目 -->
+<insert id="addProject" parameterType="com.hnjing.ai.model.entity.Project" >
+	<selectKey keyProperty="projectId" order="AFTER" resultType="java.lang.Integer">
+		SELECT LAST_INSERT_ID()
+	</selectKey>
+ 	INSERT INTO tb_project 
+	<trim prefix=" (" suffix=")" suffixOverrides=",">
+		<if test="projectId != null"> project_id,</if>
+		<if test="projectName != null"> project_name,</if>
+		<if test="totalNum != null"> total_num,</if>
+		<if test="connectedNum != null"> connected_num,</if>
+		<if test="sureNum != null"> sure_num,</if>
+		<if test="negativeNum != null"> negative_num,</if>
+		<if test="neutralNum != null"> neutral_num,</if>
+		<if test="sCode != null"> s_code,</if>
+		<if test="note != null"> note,</if>
+		gmt_created, gmt_modify
+	</trim>	 	
+	<trim prefix="values (" suffix=")" suffixOverrides=",">
+		<if test="projectId != null"> #{projectId},</if>
+		<if test="projectName != null"> #{projectName},</if>
+		<if test="totalNum != null"> #{totalNum},</if>
+		<if test="connectedNum != null"> #{connectedNum},</if>
+		<if test="sureNum != null"> #{sureNum},</if>
+		<if test="negativeNum != null"> #{negativeNum},</if>
+		<if test="neutralNum != null"> #{neutralNum},</if>
+		<if test="sCode != null"> #{sCode},</if>
+		<if test="note != null"> #{note},</if>
+		now(), now()
+	</trim>
+</insert>
+
+<!-- 根据标识，修改 AI项目 -->  
+<update id="modifyProject" parameterType="com.hnjing.ai.model.entity.Project" >
+  	UPDATE tb_project SET
+	<trim suffixOverrides=",">
+		<if test="projectName != null"> project_name = #{projectName},</if>
+		<if test="totalNum != null"> total_num = #{totalNum},</if>
+		<if test="connectedNum != null"> connected_num = #{connectedNum},</if>
+		<if test="sureNum != null"> sure_num = #{sureNum},</if>
+		<if test="negativeNum != null"> negative_num = #{negativeNum},</if>
+		<if test="neutralNum != null"> neutral_num = #{neutralNum},</if>
+		<if test="sCode != null"> s_code = #{sCode},</if>
+		<if test="note != null"> note = #{note},</if>
+		gmt_modify = now()
+	</trim>
+	WHERE project_id = #{projectId}
+</update>
+ 
+<!-- 删除 AI项目 -->
+<delete id="dropProjectByProjectId" parameterType="java.lang.Integer">
+	DELETE FROM tb_project WHERE project_id = #{projectId}
+</delete> 
+
+<!-- 根据标识查询 AI项目 -->
+<select id="queryProjectByProjectId"  resultMap="ProjectResultMap" parameterType="java.lang.Integer">
+	SELECT 
+	<include refid="sql_project_item"/>
+	FROM tb_project WHERE project_id = #{projectId}
+</select>
+
+<!-- 根据属性查询AI项目 -->
+<select id="queryProjectByProperty"  resultMap="ProjectResultMap" parameterType="java.util.Map">
+	SELECT 
+	<include refid="sql_project_item"/>
+	FROM tb_project 
+	<where>
+		<include refid="sql_project_query_nowhere"/>
+		<if test="project.projectNameOnly != null">AND project_name = #{project.projectNameOnly} </if>
+		<if test="project.projectIdNot != null">AND project_id != #{project.projectIdNot} </if>
+	</where>
+</select>
+
+<!-- 根据AI项目属性与分页信息分页查询AI项目信息 -->
+<select id="queryProjectForPage"  resultMap="ProjectResultMap" > 
+	SELECT 
+	<include refid="sql_project_item"/>
+	FROM tb_project 
+	<where>
+		<include refid="sql_project_query_nowhere"/>
+	</where>
+</select>
+
+</mapper>   

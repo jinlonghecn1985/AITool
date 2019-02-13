@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+<title>AI分析管理工具-流程信息部</title>
+	<meta charset="utf-8">
+  	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<!-- ZUI 标准版压缩后的 CSS 文件 -->
+	<link rel="stylesheet" href="./css/zui.min.css" />
+	<!-- ZUI Javascript 依赖 jQuery -->
+	<script src="./lib/jquery/jquery.js"></script>
+	<!-- ZUI 标准版压缩后的 JavaScript 文件 -->
+	<script src="./js/zui.min.js"></script>	
+	<!-- 自定义业务 JavaScript 文件 -->
+	<script src="avril.js"></script>
+<style type="text/css"> 
+.elehidden{display: none;}
+</style> 	
+	<script type="text/javascript">	
+	var searchWord = '';
+	var pagenum = 1;
+	var pagesize = 15;
+$(document).ready(function(){	
+	$('#autherTitle').html(AVRIL.authorName());
+	$('#searchKeyWord').bind('keypress', function(event) {
+		if (event.keyCode == 13) {
+			doSearchAction2();
+		}
+	});	
+	reloadData();	
+});
+var moddelHtml = "&nbsp;&nbsp;<i data-toggle=\"tooltip\" title=\"点击修订计划信息\" onclick=\"modifyPersion2(this);\" class=\"icon icon-cog\"></i>";
+
+function modifyPersion2(th){
+	modifyPersion($(th).parent().parent()[0]);
+}
+
+function addPersion(){	
+	$('#fromProjectName').val('');	
+	$('#fromCode').val('');
+	$('#fromProjectId').val('');
+	showInfoWindow();
+}
+function modifyPersion(th){
+	var tddata = $(th).children();	
+	$('#fromProjectId').val(tddata.eq(0).children("input").val());
+	$('#fromProjectName').val(tddata.eq(2).html());
+	$('#fromCode').val(tddata.eq(1).html());
+	showInfoWindow();
+}
+
+function goProjectM(th){
+	var tddata = $(th).children();	
+	AVRIL.setProject(tddata.eq(0).children("input").val(), tddata.eq(2).html());
+	parent.changDetail();
+}
+
+function loadPersionListBack(data){	
+	if(data!=undefined && data.page!=undefined){
+		if(data.data!=undefined && data.data.length>0){
+			var ihtml = "";
+			for(var i=0; i<data.data.length; i++){
+				ihtml+=("<tr data-toggle=\"tooltip\" title=\"双击进入计划详情页\" ondblclick=\"goProjectM(this);\">"				
+						+"<td>"+(data.page.startRow+i)+"<input type=\"hidden\" value=\""+data.data[i].projectId+"\">"+moddelHtml+"</td>"
+						+"<td>"+(data.data[i].sCode==undefined?'':data.data[i].sCode)+"</td>"	
+						+"<td>"+data.data[i].projectName+"</td>"		
+						+"<td>"+data.data[i].totalNum+"</td>"
+						+"<td>"+data.data[i].connectedNum+"</td>"
+						+"<td>"+data.data[i].sureNum+"</td>"
+						+"<td>"+data.data[i].negativeNum+"</td>"
+						+"<td>"+data.data[i].neutralNum+"</td>"									
+						+"<td>"+data.data[i].gmtCreated+"</td>"
+						+"<td>"+data.data[i].gmtModify+"</td>"
+						+"</tr>");
+			}	 		
+			$("#persionTable").html(ihtml);
+			AVRIL.initPageBar(data.page);
+			return;
+		}		
+	}
+	AVRIL.initPageBar(null);
+	$("#persionTable").html('<tr><td colspan=\"12\"><font color=\"red\">没有查询到数据。</font></td></tr>');
+	
+}
+
+function doSearchAction2(){
+	pagenum = 1;
+	searchWord = $('#searchKeyWord').val();		
+	reloadData();
+}
+
+function reloadData(){	
+	AVRIL.loadProjectList(loadPersionListBack, pagenum, pagesize, searchWord);	
+}
+function goPage(pn){
+	pagenum = pn;
+	reloadData();
+}
+
+function showInfoWindow(){
+	$('#infoWindow').modal({
+	    keyboard : true,
+	    show     : true
+	});	
+}
+
+function doDataCheck(){
+	$fromProjectName = $('#fromProjectName');
+	if($fromProjectName.val().length==0){
+		showJLWarning('请填写计划名称');
+		$fromProjectName.focus().parent().addClass('has-error');		
+		return;
+	}
+	$fromProjectName.parent().removeClass('has-error');
+	
+	var obj = {};	
+	obj.projectName = $fromProjectName.val();
+	obj.projectId = $('#fromProjectId').val();
+	if($('#fromCode').val()!=undefined){	
+		obj.sCode=$('#fromCode').val();
+	}	
+	//searchWord = $fromProjectName.val();
+	AVRIL.saveProjectInfo(savePersionInfoBack, obj);
+}
+
+function savePersionInfoBack(data){
+	$('#infoWindow').modal('hide');
+	reloadData();
+}
+
+function exportFunction(){
+	showJLWarning("下载进行中，请稍候！");
+	window.open('/projects/export', '_blank');
+}
+
+</script>
+
+</head>
+
+<body style="overflow: scroll;overflow-x:hidden; overflow-y:auto">
+<!-- 搜索框 -->
+	<div class="row">
+		<div class="col-xs-0 col-sm-1 col-md-2 col-lg-3"></div>
+	  	<div class="input-group col-xs-12 col-sm-10 col-md-8 col-lg-6">
+			<input type="text" id="searchKeyWord" class="form-control" placeholder="计划名称">
+			<span class="input-group-addon" onclick="doSearchAction2();"><i class="icon icon-search">&nbsp;查询</i></span>
+		</div>
+	</div>
+<!-- 功能菜单 -->	
+	<div class="btn-group" style="float:right;margin-right: 30px;margin-bottom: 5px;">
+		  <button type="button" class="btn" onclick="addPersion();"><i class="icon icon-plus"></i>&nbsp;新增</button>
+		  <button type="button" class="btn" onclick="exportFunction();"><i class="icon icon-file-excel"></i>&nbsp;导出</button>
+	</div>
+
+
+	<table class="table table-striped">
+		  <thead>
+		    <tr>
+		      <th width="58px">ID</th>
+		      <th width="80px">统计代码</th>
+		      <th width="320px">计划名称</th>
+		      <th width="80px" data-toggle="tooltip" title="进行外呼号码总量">号码总量</th>
+		      <th width="80px" data-toggle="tooltip" title="外呼接通号码问题">接通总量</th>
+		      <th width="80px" data-toggle="tooltip" title="识别到沟通过程中客户回答命中肯定词的交流">肯定回复</th>
+		      <th width="80px" data-toggle="tooltip" title="识别到沟通过程中客户回答命中否定词的交流">否定回复</th>
+		      <th width="80px" data-toggle="tooltip" title="识别到沟通过程中客户不是是非的回答的交流">其它回复</th>		      
+		      	      
+		      <th width="120px">创建时间</th>
+		      <th width="120px">修订时间</th>
+		    </tr>
+		  </thead>
+	  	<tbody id="persionTable">    
+	  	</tbody>  
+</table>
+<footer style="float:right; margin-right: 10px;">
+	<ul class="pager"></ul>	
+</footer>
+
+
+<!-- 弹窗提示 --> 
+<div id="infoWindow" class="modal fade">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">×</span><span class="sr-only">关闭</span></button>
+        <h4 class="modal-title">计划配置窗口</h4>
+      </div>
+      <div class="modal-body">
+      <form class="form-horizontal">
+      	<input type="hidden" id="fromProjectId" value="0"/>
+		  <div class="form-group">
+		     <label for="fromPK" class="col-sm-2">计划名称</label>
+		    <div class="col-sm-10">
+		      <input type="text" class="form-control" id="fromProjectName" data-toggle="tooltip" title="计划名称" placeholder="请填写计划名称" >
+		    </div>
+		  </div>
+		  <div class="form-group">
+		     <label for="fromPK" class="col-sm-2">统计代码</label>
+		    <div class="col-sm-10">
+		      <input type="text" class="form-control" id="fromCode" data-toggle="tooltip" title="统计代码" placeholder="统计代码，为后期统计分析预留" >
+		      <font color="red">注：*****非管理人员请慎重*****</font>
+		    </div>
+		  </div>
+		  
+		 
+	  </form>
+      </div>
+      <div class="modal-footer">
+      	<input type="hidden" id="stageIdForDel"></input>
+        <button type="button" class="btn btn-default" data-dismiss="modal">返回</button>
+        <button type="button" class="btn btn-primary" onclick="doDataCheck();">保存</button>
+      </div>
+    </div>
+  </div>
+</div>
+</body>
+</html>

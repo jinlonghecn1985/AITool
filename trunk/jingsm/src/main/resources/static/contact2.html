@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+<title>AI分析管理工具-流程信息部</title>
+	<meta charset="utf-8">
+  	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<!-- ZUI 标准版压缩后的 CSS 文件 -->
+	<link rel="stylesheet" href="./css/zui.min.css" />
+	<!-- ZUI Javascript 依赖 jQuery -->
+	<script src="./lib/jquery/jquery.js"></script>
+	<!-- ZUI 标准版压缩后的 JavaScript 文件 -->
+	<script src="./js/zui.min.js"></script>	
+	<!-- 自定义业务 JavaScript 文件 -->
+	<script src="avril.js"></script>
+<style type="text/css"> 
+.elehidden{display: none;}
+</style> 	
+	<script type="text/javascript">		
+	var pagenum = 1;
+	var pagesize = 15;
+	var searchWord='';
+$(document).ready(function(){	
+	if(AVRIL.projectId()==undefined || AVRIL.projectId().length==0){
+		parent.goMain();
+	}
+	$('#searchKeyWord').bind('keypress', function(event) {
+		if (event.keyCode == 13) {
+			doSearchAction2();
+		}
+	});	
+	$("#uploadFrom").attr("action", "/contactss/upload/"+AVRIL.projectId());
+	reloadData();	
+});
+function doSearchAction2(){
+	pagenum = 1;
+	searchWord = $('#searchKeyWord').val();		
+	reloadData();
+}
+function getSourceName(so){
+	if(so==undefined || so == 0 ){
+		return "待呼";
+	}else if(so ==1){
+		return "已呼";
+	}else if(so ==2){
+		return "停机、呼叫失败";
+	}else{
+		return "未定义";
+	}
+}
+
+function loadPersionListBack(data){	
+	if(data!=undefined && data.page!=undefined){
+		if(data.data!=undefined && data.data.length>0){
+			var ihtml = "";
+			for(var i=0; i<data.data.length; i++){
+				ihtml+=("<tr>"
+						+"<td>"+(data.page.startRow+i)+"<input type=\"hidden\" value=\""+data.data[i].contactsId+"\"></td>"
+						+"<td>"+getSourceName(data.data[i].status)+"</td>"	
+						+"<td>"+(data.data[i].contacts==undefined?"":data.data[i].contacts)+"</td>"	
+						+"<td>"+(data.data[i].phone==undefined?"":data.data[i].phone)+"</td>"	
+						+"<td>"+(data.data[i].company==undefined?"":data.data[i].company)+"</td>"						
+						+"<td>"+data.data[i].gmtCreated+"</td>"
+						+"<td>"+data.data[i].gmtModify+"</td>"
+						+"</tr>");
+			}	 		
+			$("#persionTable").html(ihtml);
+			AVRIL.initPageBar(data.page);
+			return;
+		}		
+	}
+	AVRIL.initPageBar(null);
+	$("#persionTable").html('<tr><td colspan=\"7\"><font color=\"red\">没有查询到数据。</font></td></tr>');
+	
+}
+
+
+function reloadData(){	
+	AVRIL.loadContactsList(loadPersionListBack, pagenum, pagesize, searchWord);	
+}
+
+function goPage(pn){
+	pagenum = pn;
+	reloadData();
+}
+
+function showInfoWindow(){
+	$('#infoWindow').modal({
+	    keyboard : true,
+	    show     : true
+	});	
+}
+
+function doDataCheck(){	
+	showJLWarning("上传数据中，可能等待时间较长。请耐心等待，具体时间依数据量而定！");
+	$("#uploadFrom").submit();
+}
+
+function exportFunction(){
+	showJLWarning("下载进行中，请稍候！");
+	if(searchWord.length>0){
+		pa = "&contacts="+searchWord;
+	}
+	window.open('/contactss/export?projectId='+AVRIL.projectId()+pa, '_blank');
+}
+</script>
+
+</head>
+
+<body style="overflow: scroll;overflow-x:hidden; overflow-y:auto">
+<!-- 搜索框 -->
+	<div class="row">
+		<div class="col-xs-0 col-sm-1 col-md-2 col-lg-3"></div>
+	  	<div class="input-group col-xs-12 col-sm-10 col-md-8 col-lg-6">
+			<input type="text" id="searchKeyWord" class="form-control" placeholder="联系人姓名、电话、公司名称">
+			<span class="input-group-addon" onclick="doSearchAction2();"><i class="icon icon-search">&nbsp;查询</i></span>
+		</div>
+	</div>
+<!-- 功能菜单 -->	
+	<div class="btn-group" style="float:right;margin-right: 30px;margin-bottom: 5px;">
+		  <button type="button" class="btn" onclick="showInfoWindow();"><i class="icon icon-plus"></i>&nbsp;导入</button>
+		  <button type="button" class="btn" onclick="exportFunction();"><i class="icon icon-file-excel"></i>&nbsp;导出</button>
+	</div>
+
+<table class="table table-striped">
+		  <thead>
+		    <tr>
+		      <th width="28px"></th>
+		      <th width="68px">状态</th>
+		      <th width="188px">联系人</th>
+		      <th width="168px">联系电话</th>
+		      <th>客户公司</th>	
+		      <th width="120px">创建时间</th>
+		      <th width="120px">修订时间</th>
+		    </tr>
+		  </thead>
+	  	<tbody id="persionTable">    
+	  	</tbody>  
+</table>
+<footer style="float:right; ">
+	<ul class="pager"></ul>	
+</footer>
+<!-- 弹窗提示 --> 
+<div id="infoWindow" class="modal fade">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">×</span><span class="sr-only">关闭</span></button>
+        <h4 class="modal-title">计划配置窗口</h4>
+      </div>
+      <div class="modal-body">
+	    <form id="uploadFrom" action="/contactss/upload" method="post" enctype="multipart/form-data">
+	   		<input type="file" name="xlsFile"/>
+<!-- 	       <input type="submit" value="提交"/> -->
+	    </form>	
+      </div>
+      <div class="modal-footer">
+      	<input type="hidden" id="stageIdForDel"></input>
+        <button type="button" class="btn btn-default" data-dismiss="modal">返回</button>
+        <button type="button" class="btn btn-primary" onclick="doDataCheck();">保存</button>
+      </div>
+    </div>
+  </div>
+</div>
+</body>
+</html>

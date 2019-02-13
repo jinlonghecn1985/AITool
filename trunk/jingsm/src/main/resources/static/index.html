@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+<title>AI分析管理工具-流程信息部</title>
+	<meta charset="utf-8">
+  	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<!-- ZUI 标准版压缩后的 CSS 文件 -->
+	<link rel="stylesheet" href="./css/zui.min.css" />
+	<!-- ZUI Javascript 依赖 jQuery -->
+	<script src="./lib/jquery/jquery.js"></script>
+	<!-- ZUI 标准版压缩后的 JavaScript 文件 -->
+	<script src="./js/zui.min.js"></script>	
+	<!-- 自定义业务 JavaScript 文件 -->
+	<script src="avril.js"></script>
+<style type="text/css">
+* {
+	margin: 0;
+	padding: 0;
+}
+
+html, body {
+	height: 100%;
+	overflow:scroll;
+	overflow-x:hidden;
+	overflow-y:hidden;
+}
+
+.wrap {
+	position: relative;
+	min-height: 100%;
+	padding-top: 52px;
+	padding-bottom: 28px;
+	box-sizing: border-box;
+}
+
+.active{
+	color:#79FF79;
+}
+
+.header {
+	position: absolute;
+	top: 0;
+	width: 100%;
+	height: 52px;
+}
+
+.footer {
+	position: absolute;
+	bottom: 0;
+	background-color: #CAFFFF;
+	width: 100%;
+	height: 20px;
+}
+
+</style>
+<script type="text/javascript">
+function goMain(){
+	showJLWarning("请先在外呼计划列表中双击计划后操作!");
+	changMenu(0);
+}
+function changDetail(){
+	changMenu(1);
+}
+function changMenu(ac){
+	$("#mainMenu").children(".active").removeClass('active');
+	$("#mainMenu").children().eq(ac).addClass('active');
+	$("#fafd").focus();
+	if(ac==0){
+		$("#main").attr("src", "project2.html");
+	}else if(ac==1){
+		$("#main").attr("src", "contact2.html");
+	}else if(ac==2){
+		$("#main").attr("src", "regulation2.html");
+	}else if(ac==3){
+		$("#main").attr("src", "communicate2.html");
+	}else if(ac==4){
+		$("#main").attr("src", "assessment2.html");
+	}
+}
+
+function setIframeHeight(iframe) {
+	if (iframe) {
+		iframe.height = (document.documentElement.clientHeight || document.body.clientHeight)-88;
+	}
+};
+
+window.onload = function() {
+	setIframeHeight(document.getElementById('main'));
+};
+</script>
+</head>
+
+<body>
+<div class="wrap">
+    <div class="header">
+	    <nav class="navbar navbar-inverse" role="navigation">
+			<div class="container-fluid">
+				<div class="navbar-header">
+					<ul class="nav nav-secondary" id="mainMenu">
+						<li class="active"><a data-toggle="tooltip" title="外呼计划列表及创建" href="javascript:void(0);changMenu('0');"><h4><b>外呼计划</b></h4></a></li>	
+						<li><a data-toggle="tooltip" title="外呼计划详情查询及数据管理" href="javascript:void(0);changMenu('1');"><h4><b>联系人</b></h4></a></li>
+						<li><a data-toggle="tooltip" title="外呼计划详情查询及数据管理" href="javascript:void(0);changMenu('2');"><h4><b>话术策略</b></h4></a></li>
+						<li><a data-toggle="tooltip" title="外呼计划详情查询及数据管理" href="javascript:void(0);changMenu('3');"><h4><b>通话详情</b></h4></a></li>
+						<li><a data-toggle="tooltip" title="外呼计划详情查询及数据管理" href="javascript:void(0);changMenu('4');"><h4><b>分析详情</b></h4></a></li>
+					</ul>
+				</div>
+				<!-- 导航计划 -->
+		   		<div class="collapse navbar-collapse navbar-collapse-example" style="padding-top: 20px;">
+					<ul class="nav navbar-nav navbar-right">
+						<button width="0px" id="fafd">&nbsp;</button>
+		        		<font color="#F0F8FF" id="autherTitle">info</font>
+		        	</ul>
+		        </div>
+			</div>
+		</nav>
+    </div>
+    <div class="content">
+    	<iframe width="100%" src="project2.html" style="width:100%;height:300;padding-top: 9px;" scrolling="auto" frameborder="0" id="main" name="main" ></iframe>
+    </div>
+    <div class="footer" style="text-align:center;"><h4 style="margin-top: 3px;">技术支持：流程信息部</h4></div>
+  </div>
+
+</body>
+</html>

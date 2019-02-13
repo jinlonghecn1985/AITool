@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hnjing.ai.model.dao.ContactsMapper">
+
+<!-- Result Map-->
+<resultMap id="ContactsResultMap" type="com.hnjing.ai.model.entity.Contacts">
+	<id column="contacts_id" property="contactsId"/>
+	<result column="project_id" property="projectId"/>
+	<result column="status" property="status"/>
+	<result column="contacts" property="contacts"/>
+	<result column="phone" property="phone"/>
+	<result column="company" property="company"/>
+	<result column="gmt_created" property="gmtCreated"/>
+	<result column="gmt_modify" property="gmtModify"/>
+</resultMap>
+
+<sql id="sql_contacts_item">
+	contacts_id, project_id, status, contacts, phone, company, gmt_created, gmt_modify
+</sql>
+       
+<!-- 查询条件 无WHERE -->
+<sql id="sql_contacts_query_nowhere">
+	<trim prefix=" " prefixOverrides="AND|OR">
+		<if test="contacts.contactsId != null">AND contacts_id = #{contacts.contactsId} </if>
+		<if test="contacts.projectId != null">AND project_id = #{contacts.projectId} </if>
+		<if test="contacts.status != null">AND status = #{contacts.status} </if>
+		<if test="contacts.contacts != null">AND (contacts like concat('%', #{contacts.contacts}, '%') or phone like concat('%', #{contacts.contacts}, '%') or company like concat('%', #{contacts.contacts}, '%'))</if>
+		<if test="contacts.phone != null">AND phone like concat(#{contacts.phone}, '%') </if>
+		<if test="contacts.company != null">AND company like concat(#{contacts.company}, '%') </if>
+	</trim>
+</sql>
+   
+<!-- 插入 项目联系人信息 -->
+<insert id="addContacts" parameterType="com.hnjing.ai.model.entity.Contacts" >
+	<selectKey keyProperty="contactsId" order="AFTER" resultType="java.lang.Integer">
+		SELECT LAST_INSERT_ID()
+	</selectKey>
+ 	INSERT INTO tb_contacts 
+	<trim prefix=" (" suffix=")" suffixOverrides=",">
+		<if test="contactsId != null"> contacts_id,</if>
+		<if test="projectId != null"> project_id,</if>
+		<if test="status != null"> status,</if>
+		<if test="contacts != null"> contacts,</if>
+		<if test="phone != null"> phone,</if>
+		<if test="company != null"> company,</if>
+		gmt_created, gmt_modify
+	</trim>	 	
+	<trim prefix="values (" suffix=")" suffixOverrides=",">
+		<if test="contactsId != null"> #{contactsId},</if>
+		<if test="projectId != null"> #{projectId},</if>
+		<if test="status != null"> #{status},</if>
+		<if test="contacts != null"> #{contacts},</if>
+		<if test="phone != null"> #{phone},</if>
+		<if test="company != null"> #{company},</if>
+		now(), now()
+	</trim>
+</insert>
+
+<!-- 根据标识，修改 项目联系人信息 -->  
+<update id="modifyContacts" parameterType="com.hnjing.ai.model.entity.Contacts" >
+  	UPDATE tb_contacts SET
+	<trim suffixOverrides=",">
+		<if test="projectId != null"> project_id = #{projectId},</if>
+		<if test="status != null"> status = #{status},</if>
+		<if test="contacts != null"> contacts = #{contacts},</if>
+		<if test="phone != null"> phone = #{phone},</if>
+		<if test="company != null"> company = #{company},</if>
+		<if test="gmtCreated != null"> gmt_created = #{gmtCreated},</if>
+		gmt_modify = now()
+	</trim>
+	WHERE contacts_id = #{contactsId}
+</update>
+ 
+<!-- 删除 项目联系人信息 -->
+<delete id="dropContactsByContactsId" parameterType="java.lang.Integer">
+	DELETE FROM tb_contacts WHERE contacts_id = #{contactsId}
+</delete> 
+
+<delete id="dropContactsByProjectId" parameterType="java.lang.Integer">
+	DELETE FROM tb_contacts WHERE project_id = #{projectId}
+</delete> 
+
+<select id="queryContactsCount"  resultType="java.lang.Integer" parameterType="java.util.Map">
+	SELECT count(1) ct FROM tb_contacts
+	<where>
+		<include refid="sql_contacts_query_nowhere"/>
+	</where>
+</select>
+
+<!-- 根据标识查询 项目联系人信息 -->
+<select id="queryContactsByContactsId"  resultMap="ContactsResultMap" parameterType="java.lang.Integer">
+	SELECT 
+	<include refid="sql_contacts_item"/>
+	FROM tb_contacts WHERE contacts_id = #{contactsId}
+</select>
+
+<!-- 根据属性查询项目联系人信息 -->
+<select id="queryContactsByProperty"  resultMap="ContactsResultMap" parameterType="java.util.Map">
+	SELECT 
+	<include refid="sql_contacts_item"/>
+	FROM tb_contacts 
+	<where>
+		<include refid="sql_contacts_query_nowhere"/>
+		<if test="contacts.searchWord != null">AND ( contacts like concat('%', #{contacts.searchWord}, '%') or phone like concat('%', #{contacts.searchWord}, '%')
+					or company like concat('%', #{contacts.searchWord}, '%') )</if>
+	</where>
+</select>
+
+<!-- 根据项目联系人信息属性与分页信息分页查询项目联系人信息信息 -->
+<select id="queryContactsForPage"  resultMap="ContactsResultMap" > 
+	SELECT 
+	<include refid="sql_contacts_item"/>
+	FROM tb_contacts 
+	<where>
+		<include refid="sql_contacts_query_nowhere"/>
+	</where>
+</select>
+
+</mapper>   
