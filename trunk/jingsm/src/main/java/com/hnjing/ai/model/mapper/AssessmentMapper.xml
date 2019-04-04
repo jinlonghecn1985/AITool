@@ -94,6 +94,19 @@
 	FROM tb_assessment WHERE cid = #{cid}
 </select>
 
+<!-- 查询指定计划策略和问题的匹配情况 -->
+<select id="queryRegulationQuestionByPid" resultType="java.util.HashMap" parameterType="java.lang.Integer">
+select content, question from (
+select DISTINCT(content) content from tb_regulations where project_id=#{projectId}) t 
+LEFT OUTER JOIN (
+select DISTINCT(question) question from tb_assessment where project_id=#{projectId} ) t2 on t.content=t2.question
+union 
+select content, question from (
+select DISTINCT(content) content from tb_regulations where project_id=#{projectId}) t3 
+RIGHT OUTER JOIN (
+select DISTINCT(question) question from tb_assessment where project_id=#{projectId} ) t4 on t3.content=t4.question
+</select>
+
 <!-- 根据属性查询沟通分析 -->
 <select id="queryAssessmentByProperty"  resultMap="AssessmentResultMap" parameterType="java.util.Map">
 	SELECT 
@@ -113,6 +126,30 @@
 	<where>
 		<include refid="sql_assessment_query_nowhere"/>
 	</where>
+</select>
+
+<select id="queryAssessentTotal" parameterType="java.lang.Integer" resultType="java.util.HashMap">
+select t.*, ifnull(t0.total0, 0) total0, ifnull(t1.total1, 0) total1, ifnull(t2.total2, 0) total2, ifnull(t9.total9, 0) total9 from (
+select question, count(1) total from tb_assessment where project_id=#{projectId} GROUP BY question
+) t LEFT OUTER JOIN (
+select question, count(1) total0 from tb_assessment where project_id=#{projectId} and assessment=0  GROUP BY question
+) t0 on t.question= t0.question
+LEFT OUTER JOIN (
+select question, count(1) total1 from tb_assessment where project_id=#{projectId} and assessment=1  GROUP BY question
+) t1 on t.question= t1.question
+LEFT OUTER JOIN (
+select question, count(1) total2 from tb_assessment where project_id=#{projectId} and assessment=2  GROUP BY question
+) t2 on t.question= t2.question
+LEFT OUTER JOIN (
+select question, count(1) total9 from tb_assessment where project_id=#{projectId} and assessment=9  GROUP BY question
+) t9 on t.question= t9.question
+order by total desc
+</select>
+
+<select id="queryAssessmentKeyword" parameterType="java.lang.Integer" resultType="java.util.HashMap">
+select * from (
+select question, ifnull(keyword, '--') keyword, concat(''+count(1)) ct from tb_assessment where project_id=#{projectId} group by question,keyword
+) t order by question asc, ct desc
 </select>
 
 </mapper>   

@@ -1,6 +1,7 @@
 package com.hnjing.ai.model.dao;
 
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -61,6 +62,16 @@ public interface AssessmentMapper {
 	 * @return Assessment
 	 */
 	Assessment queryAssessmentByCid(Integer cid);
+	
+	/** 
+	* @Title: queryRegulationQuestionByPid 
+	* @Description: 查询指定计划策略和问题的匹配情况 
+	* @param projectId
+	* @return  
+	* List<HashMap>    返回类型 
+	* @throws 
+	*/
+	List<HashMap<String, String>> queryRegulationQuestionByPid(Integer projectId);
 	 
 	/**
 	 * @Title: queryAssessmentForPage
@@ -78,6 +89,24 @@ public interface AssessmentMapper {
 	  */
 	 List<Assessment> queryAssessmentByProperty(@Param("assessment") Map<String, Object> map);
 	 
-	 
+	/** 
+	* @Title: queryAssessmentKeyword 
+	* @Description: 查询分析结果中命中词汇情况
+	* @param projectId
+	* @return  
+	* List<Map<String,String>>    返回类型 
+	* @throws 
+	*/
+	List<Map<String, String>> queryAssessmentKeyword(Integer projectId);
+	
+	/** 
+	* @Title: queryAssessentTotal 
+	* @Description: 查询分析总体情况
+	* @param projectId
+	* @return  
+	* List<Map<String,String>>    返回类型 
+	* @throws 
+	*/
+	List<Map<String, String>> queryAssessentTotal(Integer projectId);
 	 
 }

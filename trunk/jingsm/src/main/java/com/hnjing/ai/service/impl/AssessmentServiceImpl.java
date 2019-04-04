@@ -172,6 +172,87 @@ public class  AssessmentServiceImpl implements AssessmentService {
 		return ExcelWriteUtil.getHSSFWorkbook("分析结果详情", title, data, null);
 	}
 
+	/*
+	 * @Title: exportRegulationQuestionByPid
+	 * @Description: 策略和问题的匹配情况
+	 * @param @param projectId
+	 * @param @return    参数  
+	 * @author Jinlong He
+	 * @param projectId
+	 * @return
+	 * @see com.hnjing.ai.service.AssessmentService#exportRegulationQuestionByPid(java.lang.Integer)
+	 */ 
+	@Override
+	public HSSFWorkbook exportRegulationQuestionByPid(Integer projectId) {
+		String[] title = {"策略内容", "AI问题"};
+		String[][] data = null;
+		List<HashMap<String, String>> info = assessmentMapper.queryRegulationQuestionByPid(projectId);
+		if(info!=null && info.size()>0) {
+			data = new String[info.size()][2];
+			for(int j=0; j<info.size(); j++) {
+				data[j][0] = info.get(j).get("content");
+				data[j][1] = info.get(j).get("question");
+			}
+		}
+		return ExcelWriteUtil.getHSSFWorkbook("计划策略和问题的匹配情况", title, data, null);
+	}
+
+	/*
+	 * @Title: queryAssessmentKeyword
+	 * @Description: 
+	 * @param @param projectId
+	 * @param @return    参数  
+	 * @author Jinlong He
+	 * @param projectId
+	 * @return
+	 * @see com.hnjing.ai.service.AssessmentService#queryAssessmentKeyword(java.lang.Integer)
+	 */ 
+	@Override
+	public List<Map<String, String>> queryAssessmentKeyword(Integer projectId) {
+		return assessmentMapper.queryAssessmentKeyword(projectId);
+	}
+
+	/*
+	 * @Title: exportAssessmentKeyword
+	 * @Description: TODO
+	 * @param @param projectId
+	 * @param @return    参数  
+	 * @author Jinlong He
+	 * @param projectId
+	 * @return
+	 * @see com.hnjing.ai.service.AssessmentService#exportAssessmentKeyword(java.lang.Integer)
+	 */ 
+	@Override
+	public HSSFWorkbook exportAssessmentKeyword(Integer projectId) {
+		String[] title = {"问题", "关键词", "数量"};
+		String[][] data = null;
+		List<Map<String, String>> info = queryAssessmentKeyword(projectId);
+		if(info!=null && info.size()>0) {
+			data = new String[info.size()][3];
+			for(int j=0; j<info.size(); j++) {
+				data[j][0] = info.get(j).get("question");
+				data[j][1] = info.get(j).get("keyword");
+				data[j][2] = info.get(j).get("ct");
+			}
+		}
+		return ExcelWriteUtil.getHSSFWorkbook("问题与关键词匹配情况", title, data, null);
+	}
+
+	/*
+	 * @Title: queryAssessentTotal
+	 * @Description: TODO
+	 * @param @param projectId
+	 * @param @return    参数  
+	 * @author Jinlong He
+	 * @param projectId
+	 * @return
+	 * @see com.hnjing.ai.service.AssessmentService#queryAssessentTotal(java.lang.Integer)
+	 */ 
+	@Override
+	public List<Map<String, String>> queryAssessentTotal(Integer projectId) {
+		return assessmentMapper.queryAssessentTotal(projectId);
+	}
+
 
 
 }

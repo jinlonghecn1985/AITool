@@ -4,6 +4,8 @@ import java.beans.IntrospectionException;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.lang.reflect.InvocationTargetException;
+import java.util.List;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletResponse;
 
@@ -126,6 +128,51 @@ public class AssessmentController{
 		}
 		String fileName = "assessment_item_"+System.currentTimeMillis()+".xls";
 		HSSFWorkbook wb = assessmentService.exportByProperty(ClassUtil.transBean2Map(assessment, false));
+		HttpTool.setResponseHeader(response, fileName);
+		OutputStream os = response.getOutputStream();
+		wb.write(os);
+		os.flush();
+		os.close();
+	}
+	
+	@ApiOperation(value = "导出指定计划策略和问题的匹配情况 ", notes = "导出数据")
+	@RequestMapping(value = "/assessments/export2/{projectId:.+}", method = RequestMethod.GET)
+	public void exportRegulationDataList(HttpServletResponse response,
+			@PathVariable Integer projectId) throws IntrospectionException, IllegalAccessException, IllegalArgumentException, InvocationTargetException, IOException {	
+		Project tempProject = projectService.queryProjectByProjectId(projectId);
+		if(null == tempProject){
+			throw new NotFoundException("AI项目");
+		}
+		String fileName = "ass_reg_item_"+System.currentTimeMillis()+".xls";
+		HSSFWorkbook wb = assessmentService.exportRegulationQuestionByPid(projectId);
+		HttpTool.setResponseHeader(response, fileName);
+		OutputStream os = response.getOutputStream();
+		wb.write(os);
+		os.flush();
+		os.close();
+	}
+	
+	@ApiOperation(value = "分析结果匹配情况", notes = "分析结果匹配情况")
+	@RequestMapping(value = "/assessments/keyword/{projectId:.+}", method = RequestMethod.GET)
+	public List<Map<String, String>> queryAssessmentKeyword(HttpServletResponse response,
+			@PathVariable Integer projectId) throws IntrospectionException, IllegalAccessException, IllegalArgumentException, InvocationTargetException, IOException {	
+		Project tempProject = projectService.queryProjectByProjectId(projectId);
+		if(null == tempProject){
+			throw new NotFoundException("AI项目");
+		}		
+		return assessmentService.queryAssessentTotal(projectId);
+	}
+	
+	@ApiOperation(value = "导出分析结果用词匹配情况 ", notes = "导出数据")
+	@RequestMapping(value = "/assessments/export3/{projectId:.+}", method = RequestMethod.GET)
+	public void exportKeywordDataList(HttpServletResponse response,
+			@PathVariable Integer projectId) throws IntrospectionException, IllegalAccessException, IllegalArgumentException, InvocationTargetException, IOException {	
+		Project tempProject = projectService.queryProjectByProjectId(projectId);
+		if(null == tempProject){
+			throw new NotFoundException("AI项目");
+		}
+		String fileName = "ass_keyword_"+System.currentTimeMillis()+".xls";
+		HSSFWorkbook wb = assessmentService.exportAssessmentKeyword(projectId);
 		HttpTool.setResponseHeader(response, fileName);
 		OutputStream os = response.getOutputStream();
 		wb.write(os);

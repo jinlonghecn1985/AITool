@@ -85,5 +85,46 @@ public interface AssessmentService {
 	* @throws 
 	*/
 	HSSFWorkbook exportByProperty(Map<String, Object> map);	 
+	
+	/** 
+	* @Title: exportRegulationQuestionByPid 
+	* @Description: 导出指定计划策略和问题的匹配情况
+	* @param projectId
+	* @return  
+	* HSSFWorkbook    返回类型 
+	* @throws 
+	*/
+	HSSFWorkbook exportRegulationQuestionByPid(Integer projectId);	
+	
+	
+	/** 
+	* @Title: queryAssessmentKeyword 
+	* @Description: 查询分析结果中命中词汇情况
+	* @param projectId
+	* @return  
+	* List<Map<String,String>>    返回类型 
+	* @throws 
+	*/
+	List<Map<String, String>> queryAssessmentKeyword(Integer projectId);
+
+	/** 
+	* @Title: exportAssessmentKeyword 
+	* @Description: 导出分析结果用词匹配情况
+	* @param projectId
+	* @return  
+	* HSSFWorkbook    返回类型 
+	* @throws 
+	*/
+	HSSFWorkbook exportAssessmentKeyword(Integer projectId);
+	
+	/** 
+	* @Title: queryAssessentTotal 
+	* @Description: 查询分析总体情况
+	* @param projectId
+	* @return  
+	* List<Map<String,String>>    返回类型 
+	* @throws 
+	*/
+	List<Map<String, String>> queryAssessentTotal(Integer projectId);
 	 
 }

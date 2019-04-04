@@ -103,6 +103,16 @@ function exportFunction(){
 	}
 	window.open('/assessments/export?projectId='+AVRIL.projectId()+pa, '_blank');
 }
+
+function export2Function(){
+	showJLWarning("下载进行中，请稍候！");
+	
+	window.open('/assessments/export2/'+AVRIL.projectId(), '_blank');
+}
+
+function export3Function(){
+	window.location.href="/keyword.html";
+}
 </script>
 
 </head>
@@ -119,7 +129,12 @@ function exportFunction(){
 <!-- 功能菜单 -->	
 	<div class="btn-group" style="float:right;margin-right: 30px;margin-bottom: 5px;">
 <!-- 		  <button type="button" class="btn" onclick="addPersion();"><i class="icon icon-plus"></i>&nbsp;导入</button> -->
-		  <button type="button" class="btn" onclick="exportFunction();"><i class="icon icon-file-excel"></i>&nbsp;导出</button>
+		  <button type="button" class="btn" onclick="exportFunction();"><i class="icon icon-file-excel"></i>&nbsp;数据导出</button>
+		  
+		  <button type="button" class="btn" onclick="export2Function();"><i class="icon eye-open"></i>&nbsp;策略匹配导出</button>
+		  
+		  <button type="button" class="btn" onclick="export3Function();"><i class="icon icon-line-chart"></i>&nbsp;关键词匹配情况</button>
+		  
 	</div>
 
 <table class="table table-striped">

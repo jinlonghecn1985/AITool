@@ -87,6 +87,14 @@ function showJLError(message){
 		}, false);
 	}
 	
+	AVRIL.loadKeywordList = function(fn){
+		myAjax("/assessments/keyword/"+AVRIL.projectId(), "get", {}, function(data){			
+			if(fn){
+				fn(data);
+			}
+		}, false);
+	}
+	
 	AVRIL.doAssAction = function(fn){
 		myAjax("/ai/"+AVRIL.projectId(), "get", {}, function(data){			
 			if(fn){

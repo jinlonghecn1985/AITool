@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+<title>AI分析管理工具-流程信息部</title>
+	<meta charset="utf-8">
+  	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<!-- ZUI 标准版压缩后的 CSS 文件 -->
+	<link rel="stylesheet" href="./css/zui.min.css" />
+	<!-- ZUI Javascript 依赖 jQuery -->
+	<script src="./lib/jquery/jquery.js"></script>
+	<!-- ZUI 标准版压缩后的 JavaScript 文件 -->
+	<script src="./js/zui.min.js"></script>	
+	<!-- 自定义业务 JavaScript 文件 -->
+	<script src="avril.js"></script>
+<style type="text/css"> 
+.elehidden{display: none;}
+</style> 	
+	<script type="text/javascript">		
+
+$(document).ready(function(){	
+	if(AVRIL.projectId()==undefined || AVRIL.projectId().length==0){
+		parent.goMain();
+	}	
+	reloadData();	
+});
+function loadPersionListBack(data){	
+	
+		if(data!=undefined && data.length>0){
+			var ihtml = "";
+			for(var i=0; i<data.length; i++){
+				ihtml+=("<tr>"
+						+"<td>"+(i+1)+"</td>"
+						
+						+"<td>"+data[i].total+"</td>"	
+						+"<td>"+data[i].total2+"</td>"
+						+"<td>"+data[i].total1+"</td>"	
+						+"<td>"+data[i].total0+"</td>"	
+						+"<td>"+data[i].total9+"</td>"	
+						+"<td>"+data[i].question+"</td>"
+						+"</tr>");
+			}	 		
+			$("#persionTable").html(ihtml);
+			AVRIL.initPageBar(data.page);
+			return;
+		}		
+	
+	AVRIL.initPageBar(null);
+	$("#persionTable").html('<tr><td colspan=\"4\"><font color=\"red\">没有查询到数据。</font></td></tr>');
+	
+}
+
+
+function reloadData(){	
+	AVRIL.loadKeywordList(loadPersionListBack);	
+}
+
+function exportFunction(){
+	showJLWarning("下载进行中，请稍候！");	
+	window.open('/assessments/export3/'+AVRIL.projectId(), '_blank');
+}
+</script>
+
+</head>
+
+<body style="overflow: scroll;overflow-x:hidden; overflow-y:auto">
+<div class="btn-group" style="float:right;margin-right: 30px;margin-bottom: 5px;">
+<!-- 		  <button type="button" class="btn" onclick="addPersion();"><i class="icon icon-plus"></i>&nbsp;导入</button> -->
+		  <button type="button" class="btn" onclick="exportFunction();"><i class="icon icon-file-excel"></i>&nbsp;匹配详情导出</button>
+		  
+		  
+	</div>
+
+<table class="table table-striped">
+		  <thead>
+		    <tr>
+		      <th width="38px"></th>		     
+		      <th width="78px">总量</th>
+		      <th width="78px">肯定词</th>	
+		      <th width="78px">否定词</th>	
+		      <th width="78px">中立词</th>		
+		      <th width="78px">未匹配</th>	    
+		       <th>问题</th>  
+		    </tr>
+		  </thead>
+	  	<tbody id="persionTable">    
+	  	</tbody>  
+</table>
+
+</body>
+</html>
